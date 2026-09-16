@@ -38,3 +38,11 @@
    ```bash
    git clone [https://github.com/your-username/green-compute-analytics.git](https://github.com/your-username/green-compute-analytics.git)
    cd green-compute-analytics
+
+2. Установите зависимости:
+   ```bash
+   pip install -r requirements.txt
+
+3. Запустите исследовательский ноутбук:
+   ```bash
+   jupyter notebook notebooks/model_training.ipynb
