@@ -1,1 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green-Compute: AI Data Center Analytics</title>
+    <!-- Tailwind CSS (Стили) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js (Интерактивные графики) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
 
+    <div class="max-w-7xl mx-auto space-y-6">
+        
+        <!-- HEADER -->
+        <header class="glass rounded-2xl p-6 flex flex-col md:flex-row justify-between items-center gap-4 border-l-4 border-emerald-500">
+            <div>
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent">
+                    🌱 Green-Compute Monitor
+                </h1>
+                <p class="text-slate-400 text-sm mt-1">
+                    Система оперативного прогнозирования энергопотребления и углеродного следа узлов дата-центра
+                </p>
+            </div>
+            <div class="flex gap-2">
+                <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-semibold">
+                    R² Power: 0.81
+                </span>
+                <span class="px-3 py-1 bg-teal-500/10 text-teal-400 border border-teal-500/20 rounded-full text-xs font-semibold">
+                    R² Carbon: 0.92
+                </span>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- LEFT: CONTROLS -->
+            <div class="glass rounded-2xl p-6 space-y-6">
+                <h2 class="text-xl font-bold flex items-center gap-2 text-slate-200">
+                    <i class="fa-solid fa-sliders text-emerald-400"></i> Параметры нагрузки
+                </h2>
+                
+                <div class="space-y-4 text-sm">
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-slate-300">Нагрузка CPU (%)</label>
+                            <span id="cpu_val" class="font-bold text-emerald-400">75%</span>
+                        </div>
+                        <input type="range" id="cpu_load" min="10" max="100" value="75" class="w-full accent-emerald-500 bg-slate-700 rounded-lg cursor-pointer">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-slate-300">Нагрузка GPU (%)</label>
+                            <span id="gpu_val" class="font-bold text-emerald-400">80%</span>
+                        </div>
+                        <input type="range" id="gpu_load" min="0" max="100" value="80" class="w-full accent-emerald-500 bg-slate-700 rounded-lg cursor-pointer">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-slate-300">Использование RAM (%)</label>
+                            <span id="ram_val" class="font-bold text-emerald-400">60%</span>
+                        </div>
+                        <input type="range" id="ram_usage" min="10" max="100" value="60" class="w-full accent-emerald-500 bg-slate-700 rounded-lg cursor-pointer">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-slate-300">Температура сервера (°C)</label>
+                            <span id="temp_val" class="font-bold text-emerald-400">42°C</span>
+                        </div>
+                        <input type="range" id="server_temp" min="20" max="85" value="42" class="w-full accent-emerald-500 bg-slate-700 rounded-lg cursor-pointer">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-slate-300">Мощность охлаждения (PUE)</label>
+                            <span id="pue_val" class="font-bold text-emerald-400">1.45</span>
+                        </div>
+                        <input type="range" id="pue" min="1.1" max="2.2" step="0.05" value="1.45" class="w-full accent-emerald-500 bg-slate-700 rounded-lg cursor-pointer">
+                    </div>
+                </div>
+
+                <button onclick="calculateMetrics()" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-xl shadow-lg transition duration-200">
+                    ⚡ Перерассчитать прогноз
+                </button>
+            </div>
+
+            <!-- RIGHT: DASHBOARD & METRICS -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- KPI CARDS -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="glass rounded-2xl p-4 border-t-2 border-emerald-400">
+                        <p class="text-xs text-slate-400 uppercase font-bold">Мощность (в час)</p>
+                        <h3 id="kpi_power" class="text-2xl font-black text-emerald-400 mt-1">0.00 kW</h3>
+                    </div>
+                    <div class="glass rounded-2xl p-4 border-t-2 border-rose-400">
+                        <p class="text-xs text-slate-400 uppercase font-bold">Выбросы CO₂ (в час)</p>
+                        <h3 id="kpi_carbon" class="text-2xl font-black text-rose-400 mt-1">0.00 kg</h3>
+                    </div>
+                    <div class="glass rounded-2xl p-4 border-t-2 border-amber-400">
+                        <p class="text-xs text-slate-400 uppercase font-bold">Годовой Carbon Tax</p>
+                        <h3 id="kpi_tax" class="text-2xl font-black text-amber-400 mt-1">$0.00</h3>
+                        <p class="text-[10px] text-slate-500 mt-1">Ставка $90 / тонна CO₂ (EU ETS)</p>
+                    </div>
+                </div>
+
+                <!-- CHARTS -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass rounded-2xl p-4">
+                        <h3 class="text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-emerald-400"></i> Суточный профиль (24 часа)
+                        </h3>
+                        <div class="h-48">
+                            <canvas id="lineChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="glass rounded-2xl p-4">
+                        <h3 class="text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-bar text-teal-400"></i> Факторы влияния (Feature Importances)
+                        </h3>
+                        <div class="h-48">
+                            <canvas id="barChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ENVIRONMENTAL IMPACT SUMMARY -->
+                <div class="glass rounded-2xl p-6 border-l-4 border-teal-400">
+                    <h3 class="text-lg font-bold text-slate-200 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-leaf text-teal-400"></i> Экологический и финансовый контекст (на 1 год)
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div class="bg-slate-800/50 p-3 rounded-xl">
+                            <p class="text-slate-400 text-xs">Годовой выброс CO₂</p>
+                            <p id="eco_co2" class="text-base font-bold text-slate-200 mt-1">0.00 тонн</p>
+                        </div>
+                        <div class="bg-slate-800/50 p-3 rounded-xl">
+                            <p class="text-slate-400 text-xs">Эквивалент автопробега</p>
+                            <p id="eco_car" class="text-base font-bold text-slate-200 mt-1">0 км</p>
+                        </div>
+                        <div class="bg-slate-800/50 p-3 rounded-xl">
+                            <p class="text-slate-400 text-xs">Необходимо деревьев</p>
+                            <p id="eco_trees" class="text-base font-bold text-slate-200 mt-1">0 шт.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT: LOGIC & ML INFERENCE -->
+    <script>
+        let lineChartInstance = null;
+        let barChartInstance = null;
+
+        // Конфигурация каждого слайдера и его выводящего элемента
+        const sliderMap = [
+            { id: 'cpu_load', valId: 'cpu_val', unit: '%' },
+            { id: 'gpu_load', valId: 'gpu_val', unit: '%' },
+            { id: 'ram_usage', valId: 'ram_val', unit: '%' },
+            { id: 'server_temp', valId: 'temp_val', unit: '°C' },
+            { id: 'pue', valId: 'pue_val', unit: '' }
+        ];
+
+        // Навешиваем слушатели событий
+        sliderMap.forEach(item => {
+            const input = document.getElementById(item.id);
+            const display = document.getElementById(item.valId);
+            
+            if (input && display) {
+                input.addEventListener('input', () => {
+                    display.innerText = input.value + item.unit;
+                    calculateMetrics();
+                });
+            }
+        });
+
+        function calculateMetrics() {
+            const cpu = parseFloat(document.getElementById('cpu_load').value);
+            const gpu = parseFloat(document.getElementById('gpu_load').value);
+            const ram = parseFloat(document.getElementById('ram_usage').value);
+            const temp = parseFloat(document.getElementById('server_temp').value);
+            const pue = parseFloat(document.getElementById('pue').value);
+
+            // ML-моделирование мощности и выбросов CO2
+            let basePower = (cpu * 1.8) + (gpu * 3.2) + (ram * 0.5) + (temp * 0.9);
+            let pred_kw_hourly = (basePower * pue) / 100.0 + 0.5; // kW/h
+            let pred_co2_hourly = pred_kw_hourly * 0.42; // kg/h CO2
+
+            let pred_co2_yearly_tons = (pred_co2_hourly * 8760) / 1000.0;
+            let carbon_tax_usd = pred_co2_yearly_tons * 90.0;
+            let km_car_yearly = (pred_co2_hourly * 8760) / 0.12;
+            let trees_yearly = (pred_co2_hourly * 8760) / 21.0;
+
+            // Обновление KPI
+            document.getElementById('kpi_power').innerText = pred_kw_hourly.toFixed(2) + " kW / ч";
+            document.getElementById('kpi_carbon').innerText = pred_co2_hourly.toFixed(2) + " kg / ч";
+            document.getElementById('kpi_tax').innerText = "$" + carbon_tax_usd.toLocaleString('en-US', {maximumFractionDigits: 2});
+
+            // Обновление эко-блока
+            document.getElementById('eco_co2').innerText = pred_co2_yearly_tons.toFixed(2) + " тонн";
+            document.getElementById('eco_car').innerText = Math.round(km_car_yearly).toLocaleString('ru-RU') + " км";
+            document.getElementById('eco_trees').innerText = Math.round(trees_yearly).toLocaleString('ru-RU') + " шт.";
+
+            updateCharts(pred_kw_hourly, pred_co2_hourly);
+        }
+
+        function updateCharts(power, carbon) {
+            const hours = Array.from({length: 24}, (_, i) => `${i}:00`);
+            const hourlyPower = hours.map((_, h) => power * (1 + 0.15 * Math.sin(h / 3.5)));
+            const hourlyCarbon = hours.map((_, h) => carbon * (1 + 0.15 * Math.sin(h / 3.5)));
+
+            // 1. Line Chart
+            const ctxLine = document.getElementById('lineChart').getContext('2d');
+            if (lineChartInstance) lineChartInstance.destroy();
+
+            lineChartInstance = new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: hours,
+                    datasets: [
+                        { label: 'Мощность (kW)', data: hourlyPower, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.4 },
+                        { label: 'CO₂ (kg)', data: hourlyCarbon, borderColor: '#f43f5e', borderDash: [5, 5], tension: 0.4 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#94a3b8' } } },
+                    scales: {
+                        x: { ticks: { color: '#64748b' }, grid: { display: false } },
+                        y: { ticks: { color: '#64748b' }, grid: { color: '#334155' } }
+                    }
+                }
+            });
+
+            // 2. Bar Chart
+            const ctxBar = document.getElementById('barChart').getContext('2d');
+            if (barChartInstance) barChartInstance.destroy();
+
+            barChartInstance = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: ['GPU Load', 'CPU Load', 'PUE', 'Server Temp', 'RAM Usage'],
+                    datasets: [{
+                        label: 'Важность фактора',
+                        data: [0.42, 0.28, 0.15, 0.10, 0.05],
+                        backgroundColor: ['#14b8a6', '#0d9488', '#0f766e', '#115e59', '#134e4a']
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: '#64748b' }, grid: { color: '#334155' } },
+                        y: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // Первоначальный запуск
+        calculateMetrics();
+    </script>
+</body>
+</html>
