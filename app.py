@@ -72,10 +72,15 @@ def predict_and_visualize(*args):
     kpi_carbon_str = f"💨 {pred_co2_hourly:.2f} kg / ч"
     kpi_yearly_str = f"🌍 {pred_co2_yearly_tons:.2f} тонн / год"
 
-    # Экологическая сводка
+    # Расчет показателей
+    pred_co2_yearly_tons = (pred_co2_hourly * 8760) / 1000.0
+    carbon_tax_usd = pred_co2_yearly_tons * 90.0  # $90 за тонну CO2
+    
+    # Добавляем в экологическую сводку (out_eco):
     eco_summary = (
-        f"### 🚗 Экологический эквивалент (в расчете на 1 год работы):\n"
+        f"### 🚗 Экологический и финансовый эквивалент (1 год работы):\n"
         f"* **Годовой выброс CO₂:** `{pred_co2_yearly_tons:.2f} тонн`\n"
+        f"* **💰 Потенциальный углеродный налог (Carbon Tax):** `${carbon_tax_usd:,.2f} / год` (при ставке $90/т)\n"
         f"* **Эквивалент пробега авто:** `{km_car_yearly:,.0f} км`\n"
         f"* **Необходимо деревьев для нейтрализации:** `{int(trees_yearly)} шт.`"
     )
