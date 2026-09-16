@@ -1,21 +1,40 @@
-# 🌱 Green-Compute Analytics Platform
+# 🌱 Green-Compute: AI Data Center Analytics Platform
 
-<!-- [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Space-blue)](https://huggingface.co/spaces/AnaBy/compute-green-analytics) -->
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![Scikit-Learn](https://img.shields.io/badge/Library-Scikit--Learn-orange)
+![R2 Score](https://img.shields.io/badge/Model%20R2-0.92-emerald)
 
-Веб-платформа оперативного прогнозирования энергопотребления и углеродного следа узлов дата-центра на основе ML-моделей (Random Forest).
+Платформа предиктивной аналитики для прогнозирования энергопотребления, углеродного следа ($CO_2$) и финансово-экологических рисков (Carbon Tax) вычислительных узлов дата-центров.
 
-<!-- ## 🚀 Демо
-Интерактивный дашборд доступен на Hugging Face Spaces:  
-👉 **[Открыть веб-приложение](https://huggingface.co/spaces/AnaBy/compute-green-analytics)** -->
+---
 
-## 📊 Возможности
-* **Прогнозирование в реальном времени:** расчет мощности (kW) и выбросов $CO_2$ (kg/ч).
-* **Экстраполяция:** оценка годового экологического следа и перевод в понятные эквиваленты (пробег авто, количество деревьев для нейтрализации).
-* **Визуализация:** суточные профили нагрузки и Feature Importance (анализ ключевых факторов).
+## 🚀 Основные возможности
+* **Предиктивный ML-анализ:** Предсказание энергопотребления ($kW$) и выбросов $CO_2$ до запуска вычислений.
+* **Финансовая оценка:** Расчет потенциального углеродного налога (Carbon Tax) по ставке EU ETS ($90/т $CO_2$).
+* **Экологические эквиваленты:** Перевод выбросов в километры автопробега и количество деревьев для компенсации.
+* **Интерактивный дашборд:** Визуализация суточных профилей нагрузки и факторов влияния (Feature Importances).
 
-## 🛠️ Локальный запуск
+---
+
+## 🛠️ Стек технологий
+* **Core & ML (Python):** `Pandas`, `NumPy`, `Scikit-Learn` (Random Forest Regressor).
+* **Исследование:** `Jupyter Notebook`, `Matplotlib`, `Seaborn`.
+* **Frontend / Demo:** HTML5, Tailwind CSS, Chart.js.
+
+---
+
+## 📊 Результаты моделирования (Python)
+
+| Модель | Целевая метрика | $R^2$ Score | MAE |
+| :--- | :--- | :--- | :--- |
+| **Power Predictor** | Энергопотребление ($kW$) | **0.81** | 0.12 kW |
+| **Carbon Predictor** | Выбросы $CO_2$ ($kg$) | **0.92** | 0.04 kg |
+
+---
+
+## 💻 Быстрый запуск (Python)
 
 1. Клонируйте репозиторий:
    ```bash
-   git clone [https://github.com/ВАШ_NICKNAME/compute-green-analytics.git](https://github.com/Anaburiak/compute-green-analytics.git)
-   cd compute-green-analytics
+   git clone [https://github.com/your-username/green-compute-analytics.git](https://github.com/your-username/green-compute-analytics.git)
+   cd green-compute-analytics
